@@ -1,0 +1,23 @@
+# Runs the app against PostgreSQL instead of SQLite:  docker compose up --build
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: reviewpulse
+      POSTGRES_PASSWORD: reviewpulse
+      POSTGRES_DB: reviewpulse
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U reviewpulse"]
+      interval: 5s
+      retries: 10
+  app:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      DATABASE_URL: postgresql://reviewpulse:reviewpulse@db:5432/reviewpulse
+      LLM_API_KEY: ${LLM_API_KEY:-}
+    depends_on:
+      db: { condition: service_healthy }
+volumes:
+  pgdata:

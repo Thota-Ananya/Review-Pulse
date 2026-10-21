@@ -1,0 +1,10 @@
+[tool.ruff]
+line-length = 130
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["B008"]  # FastAPI's Depends()/Query() in defaults is the documented pattern
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
