@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReviewPulse — Customer Feedback Analytics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path d="M2 12h4l3-8 4 16 3-8h6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div>
+      <h1>ReviewPulse</h1>
+      <p class="sub">QuickBite customer feedback · <span id="dateRange">—</span></p>
+    </div>
+  </div>
+  <div class="controls">
+    <label>City <select id="fCity"><option value="">All cities</option></select></label>
+    <label>Platform <select id="fPlatform"><option value="">All platforms</option></select></label>
+    <button class="btn ghost" id="btnUpload">Upload CSV</button>
+    <a class="btn" id="btnExport" href="/api/export.csv">Export CSV</a>
+  </div>
+</header>
+
+<main>
+  <section class="summary" id="summaryBox">
+    <div class="summary-label">Executive summary <span class="tag" id="summarySource"></span></div>
+    <p id="summaryText">Loading…</p>
+  </section>
+
+  <section class="kpis" id="kpis"></section>
+
+  <section class="grid two">
+    <div class="card">
+      <div class="card-head"><h2>Weekly trend</h2><span class="hint">Avg rating vs share of negative reviews</span></div>
+      <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>Pain points by topic</h2><span class="hint">Click a bar to read those reviews</span></div>
+      <div class="chart-wrap"><canvas id="topicChart"></canvas></div>
+    </div>
+  </section>
+
+  <section class="grid two wide-left">
+    <div class="card">
+      <div class="card-head"><h2>Key insights</h2><span class="hint">Last 4 weeks vs previous 4 · all data</span></div>
+      <ul class="insights" id="insights"></ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>Cities</h2><span class="hint">Click a row to filter</span></div>
+      <div class="table-scroll">
+        <table class="seg" id="cityTable">
+          <thead><tr><th>City</th><th class="num">Reviews</th><th class="num">Rating</th><th class="num">CSAT</th><th class="num">Negative</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="card-head mt"><h2>Platforms</h2></div>
+      <div class="table-scroll">
+        <table class="seg" id="platformTable">
+          <thead><tr><th>Platform</th><th class="num">Reviews</th><th class="num">Rating</th><th class="num">CSAT</th><th class="num">Negative</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="explorer">
+    <div class="card-head"><h2>Review explorer</h2><span class="hint" id="reviewCount"></span></div>
+    <div class="explorer-filters">
+      <input id="rSearch" type="search" placeholder="Search text or review ID…" maxlength="100">
+      <select id="rTopic"><option value="">All topics</option></select>
+      <select id="rSentiment">
+        <option value="">All sentiment</option><option value="negative">Negative</option>
+        <option value="neutral">Neutral</option><option value="positive">Positive</option>
+      </select>
+      <label class="check"><input type="checkbox" id="rMismatch"> Stars ≠ text only</label>
+    </div>
+    <div class="table-scroll">
+      <table class="reviews">
+        <thead><tr><th>Date</th><th>City / Platform</th><th class="num">Stars</th><th>Sentiment</th><th>Topics</th><th>Review</th></tr></thead>
+        <tbody id="reviewRows"></tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <button class="btn ghost" id="prevPage">← Prev</button>
+      <span id="pageInfo"></span>
+      <button class="btn ghost" id="nextPage">Next →</button>
+    </div>
+  </section>
+  <footer>ReviewPulse · FastAPI · SQL · NLP · Data shown is synthetic demo data for a fictional company · <a href="/docs">API docs</a></footer>
+</main>
+
+<dialog id="uploadDialog">
+  <form method="dialog" id="uploadForm">
+    <h2>Upload reviews</h2>
+    <p class="muted">CSV with columns <code>review_text</code>, <code>rating</code> (1–5), <code>date</code>. Optional: <code>city</code>, <code>platform</code>, <code>review_id</code>.</p>
+    <input type="file" id="uploadFile" accept=".csv" required>
+    <label class="check"><input type="checkbox" id="uploadReplace"> Replace existing data</label>
+    <p id="uploadMsg" class="muted" role="status"></p>
+    <div class="dialog-actions">
+      <button type="button" class="btn ghost" id="btnReset">Reload demo data</button>
+      <span class="spacer"></span>
+      <button type="button" class="btn ghost" id="btnClose">Close</button>
+      <button type="submit" class="btn" id="btnDoUpload">Upload</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
